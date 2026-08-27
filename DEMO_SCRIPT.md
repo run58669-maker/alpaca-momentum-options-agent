@@ -1,7 +1,9 @@
 # DEMO_SCRIPT.md — pitch video, shot by shot
 
 Target length **3:00** (hackathon cap is 5:00 — under is better than over).
-Written 2026-08-25, **all shots re-captured 2026-08-27 15:05-15:15 JST**. Every line
+Written 2026-08-25, **all shots re-captured 2026-08-27 15:05-15:15 JST and
+re-verified 2026-08-28 02:05-02:07 JST** (5 of 6 blocks byte-identical; shot 6 was
+stale at 415 tests and is now 417 — see the re-verification note at the end). Every line
 quoted under **On screen** below is a paste from a capture file dated `20260827`, not
 a retyped number; the capture file is named next to each shot so the script can be
 re-verified before recording instead of trusted. The dates and OCC symbols in those
@@ -32,12 +34,24 @@ narration says "mock" out loud at least once per shot.
    (`scratch/demo_shot_breaker_20260827_1505.txt`); with the journal removed, the same
    command printed the breaker line (`scratch/demo_shot_breaker_freshjournal_20260827_1511.txt`).
    Shot 2 consumes the fill, so shot 4a needs its own fresh journal.
-4. **The captures below age out daily.** The mock chain's expiries are generated
-   relative to `today` (`CHAIN_EXPIRY_DAYS = (1, 3, 10, 17, 45)` in
-   `src/mcp_client.py`), so every date, OCC symbol and idempotency key in the blocks
-   below moves when the date does. The dollar figures and percentages hold; the
-   symbols do not. **Re-run every command on the recording day** and diff against the
-   blocks. If something drifted, fix the script, not the recording.
+4. **The captures below age out daily — on the UTC clock, not the JST one.** The mock
+   chain's expiries are generated relative to `today` (`CHAIN_EXPIRY_DAYS = (1, 3, 10,
+   17, 45)` in `src/mcp_client.py`), so every date, OCC symbol and idempotency key in
+   the blocks below moves when the date does. The dollar figures and percentages hold;
+   the symbols do not. **Re-run every command on the recording day** and diff against
+   the blocks. If something drifted, fix the script, not the recording.
+
+   🚨 **`today` is the UTC date** — every date in this repo comes from
+   `datetime.now(timezone.utc).date()` (`src/agent.py:54,56`, `src/exits.py:149`,
+   `src/journal.py:49`, `src/mcp_client.py:226,259,1015`, `src/strategy.py:266`).
+   JST is UTC+9, so **the chain rolls over at 09:00 JST, not at midnight JST.** A
+   session recorded between 00:00 and 09:00 JST is stamped with the *previous* JST
+   calendar day, and that is correct, not a bug — do not "fix" it. Measured
+   2026-08-28 02:05 JST: a fresh `--dry` run was byte-identical to the 2026-08-27
+   15:10 JST capture apart from one `filled_at` wall-clock field, because both fell
+   inside the same UTC day (2026-08-27). Practical consequence: **if the recording
+   runs past 09:00 JST, every date and OCC symbol shifts mid-session** — either finish
+   before 09:00 JST or re-capture everything after it, never straddle.
 5. Nothing here needs keys or network. The whole video can be shot offline.
 6. Re-recording order is load-bearing: 2 → 3 → (wipe journal) → 4a → 4b → 5 → 6.
    Shot 5 reads the last journal record, which is shot 4a's breaker record.
@@ -234,16 +248,16 @@ record after shot 4a, complete, no fields dropped):
 py -m unittest discover -s tests
 ```
 
-**On screen** (verbatim, `scratch/demo_shot_tests_20260827_1514.txt`):
+**On screen** (verbatim, `scratch/demo_shot_tests_20260828_0207.txt`):
 ```
 ----------------------------------------------------------------------
-Ran 415 tests in 2.216s
+Ran 417 tests in 2.213s
 
 OK
 ```
 
 **Narration:**
-> 415 tests, standard library only — no keys, no network, nothing to install. Clone
+> 417 tests, standard library only — no keys, no network, nothing to install. Clone
 > it and everything you just watched runs on your machine in about two seconds.
 
 **Last frame:** repo URL, full screen, held three seconds in silence.
@@ -295,5 +309,65 @@ catch, and one caught overclaim costs more than all six shots earn.
   policy". If a shot wants to show it, `scratch/demo_fallback_policy_20260826_1731.txt`
   puts all three outcomes on one screen — label the chains **CONSTRUCTED** on screen,
   the capture already prints that word.
-- **Recording tool** not chosen. Whatever it is: 1080p, and terminal font large
-  enough that the reason strings are readable.
+- ~~**Recording tool** not chosen.~~ **Chosen 2026-08-28 02:10 — render the frames,
+  do not screen-grab them.** ffmpeg 8.1 is on this machine
+  (`Gyan.FFmpeg` via winget) and it does expose `gdigrab`, so screen capture is
+  technically available — but it is the wrong tool here and is **not** to be used
+  unattended:
+  1. `gdigrab` records whatever is actually on 小Q's desktop, including anything of
+     hers that happens to be on screen. A headless loop round must not point a camera
+     at her machine.
+  2. It needs a live interactive desktop session, so it cannot run from a scheduled
+     round at all.
+  3. It is not reproducible — a re-record is never the same bytes, so the "re-run and
+     diff" check that every other artifact in this repo gets (cover, slides) would be
+     lost for the single most judge-visible file.
+
+  **The pipeline instead:** render each shot's terminal text to 1080p PNG frames with
+  PIL (same approach as `scripts/make_cover.py` / `scripts/make_slides.py`, both of
+  which already re-render byte-identically), then mux with
+  `ffmpeg -loop 1 -i frame.png -c:v libx264 -pix_fmt yuv420p`. This is deterministic,
+  fully offline, needs no desktop, and the "On screen" blocks above become the literal
+  input — so the video cannot drift from the captures the way a hand-typed take can.
+  **Proven end to end 2026-08-28 02:09**, not assumed: `scratch/probe.mp4`, ffprobe
+  reports `codec_name=h264 width=1920 height=1080 nb_frames=60 duration=2.000000`.
+  `libx264` is present in this build (`ffmpeg -encoders`).
+
+  Still open, and both are judgement calls that want a human: **narration** (SAPI TTS
+  vs a real voice vs on-screen captions only — untested either way) and whether a
+  rendered-terminal video reads as honest to a judge or as evasive. Font must still be
+  large enough that the shot-3 reason string is legible at 1080p.
+
+---
+
+## Re-verification log — 2026-08-28 02:05-02:07 JST
+
+Every shot re-run from a clean state in the load-bearing order (2 → 3 → wipe → 4a →
+4b → 5 → 6) and diffed against the 2026-08-27 captures. Result: **5 of 6 blocks
+byte-identical, 1 stale.**
+
+| shot | fresh capture | vs 2026-08-27 |
+|---|---|---|
+| 2 / 3 | `scratch/demo_shot_dry_20260828_0205.txt` | identical except one `filled_at` wall clock |
+| 4a | `scratch/demo_shot_breaker_freshjournal_20260828_0206.txt` | **byte-identical** |
+| 4b | `scratch/demo_shot_idem_20260828_0206.txt` | **byte-identical** |
+| 5 | `scratch/demo_shot_journal_20260828_0206.txt` | identical except the `ts` wall clock |
+| 6 | `scratch/demo_shot_tests_20260828_0207.txt` | **STALE — `Ran 415 tests` → `Ran 417 tests`** |
+
+**The one real defect:** shot 6's on-screen block *and its narration line* both still
+said 415. `WRITEUP.md` was corrected to 417 on 2026-08-28 00:08 but this file was
+missed, so recording from it would have put a wrong number on camera and in the
+spoken track — the one error class this script's own closing section says costs more
+than all six shots earn. Both are now 417, quoted from a capture taken today.
+
+The same stale 415 was also live in `SUBMISSION_COPY.md` (prose + the evidence table
+row that goes into the judge-facing form); both corrected, the evidence row re-dated
+to today's own measurement (`417 passed, 98 subtests passed in 4.60s`).
+
+`NEXT.md` and `NOTES.md` also contain 415, and those were **deliberately left alone** —
+they are dated historical records of what the suite measured at the time, and
+rewriting them would falsify a log rather than fix an error.
+
+No dates or OCC symbols had drifted, because 02:05 JST on 08-28 is still 2026-08-27 in
+UTC (pre-flight step 4). **This does not mean the symbols are stable** — they will all
+move at 09:00 JST.
