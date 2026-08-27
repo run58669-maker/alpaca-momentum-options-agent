@@ -189,7 +189,12 @@ def verify_against_capture(key, block, cap_rel):
 # --- drawing ------------------------------------------------------------------------------
 
 def wrap_mono(lines, fnt, width_px):
-    """Soft-wrap terminal text; continuations keep the original indent plus two spaces."""
+    """Soft-wrap terminal text; continuations keep the original indent plus two spaces.
+
+    Breaks at the last space that fits, so a wrapped line reads as words rather than as
+    `the mar` / `ks value`. A single token longer than the room is still chopped -- the
+    captures contain such tokens (OCC symbols, hashes) and they have to go somewhere.
+    """
     cols = max(20, int(width_px // draw_len("M", fnt)))
     out = []
     for raw in lines:
@@ -200,7 +205,12 @@ def wrap_mono(lines, fnt, width_px):
         rest, first = raw, True
         while rest:
             room = cols if first else cols - len(indent)
-            chunk, rest = rest[:room], rest[room:]
+            if len(rest) <= room:
+                chunk, rest = rest, ""
+            else:
+                cut = rest.rfind(" ", 1, room + 1)
+                cut = cut if cut > 0 else room
+                chunk, rest = rest[:cut].rstrip(), rest[cut:].lstrip(" ")
             out.append(chunk if first else indent + chunk)
             first = False
     return out
@@ -336,34 +346,40 @@ def main():
     for stale in frames_dir.iterdir():
         stale.unlink()
 
-    concat, total = [], 0.0
+    # Each still is held for a whole number of frames, so the planned timeline and the
+    # encoded one are the same number. The concat *demuxer* was measured not to honour its
+    # `duration` directives on stills (probe: 3.907+2.744+5.630 = 12.28s planned came out
+    # 16.20s), which is why the segments go to the concat *filter* instead, one
+    # `-loop 1 -t frames/FPS` input each.
+    shots, total_frames = [], 0
     for i, (key, screen, command, mock, cap, secs) in enumerate(plan):
-        p = frames_dir / ("frame-%03d.png" % i)
-        render_frame(key, screen, command, mock, cap).save(p)
-        secs = max(2.0, round(secs, 3))
-        concat.append("file '%s'\nduration %.3f" % (p.name, secs))
-        total += secs
-        print("  frame %03d  shot %-2s  %5.2fs  %s" % (i, key, secs, cap[:64]))
+        path = frames_dir / ("frame-%03d.png" % i)
+        render_frame(key, screen, command, mock, cap).save(path)
+        nf = max(int(2.0 * FPS), int(round(secs * FPS)))
+        shots.append((path, nf))
+        total_frames += nf
+        print("  frame %03d  shot %-2s  %5.2fs  %s" % (i, key, nf / FPS, cap[:64]))
     tail = frames_dir / "frame-tail.png"
     render_tail().save(tail)
-    concat.append("file '%s'\nduration %.3f" % (tail.name, TAIL_SECONDS))
-    concat.append("file '%s'" % tail.name)      # concat demuxer drops the final duration
-    total += TAIL_SECONDS
-    # newline="\n": the concat demuxer parses a CRLF list, but the trailing CR rides along
-    # into the duration values and the segment timings come out long.
-    with open(frames_dir / "concat.txt", "w", encoding="utf-8", newline="\n") as fh:
-        fh.write("\n".join(concat) + "\n")
-    print("%d frames, %.2fs of video planned" % (len(plan) + 1, total))
+    shots.append((tail, int(round(TAIL_SECONDS * FPS))))
+    total_frames += shots[-1][1]
+    planned = total_frames / FPS
+    print("%d frames, %.2fs of video planned" % (len(shots), planned))
     if args.frames_only:
         return
 
     out = ROOT / args.out
     out.parent.mkdir(parents=True, exist_ok=True)
-    cmd = [
-        "ffmpeg", "-y", "-hide_banner", "-loglevel", "error",
-        "-f", "concat", "-safe", "0", "-i", "concat.txt",
-        # CFR: the concat demuxer hands over stills with per-frame durations, and a
-        # variable-rate stream of 34 frames plays back unpredictably in browser players.
+    cmd = ["ffmpeg", "-y", "-hide_banner", "-loglevel", "error"]
+    for path, nf in shots:
+        cmd += ["-loop", "1", "-framerate", str(FPS), "-t", "%.6f" % (nf / FPS),
+                "-i", path.name]
+    cmd += [
+        "-filter_complex",
+        "".join("[%d:v]" % i for i in range(len(shots)))
+        + "concat=n=%d:v=1:a=0[v]" % len(shots),
+        "-map", "[v]",
+        # CFR: a variable-rate stream of stills plays back unpredictably in browser players.
         "-fps_mode", "cfr", "-r", str(FPS),
         "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-pix_fmt", "yuv420p",
         # bitexact + stripped metadata: no encoder string, no timestamps, so two runs of
@@ -372,7 +388,18 @@ def main():
         "-movflags", "+faststart", str(out),
     ]
     subprocess.run(cmd, cwd=str(frames_dir), check=True)
-    print("%s  %d B" % (out, out.stat().st_size))
+
+    # The planned length is only worth printing if it is also the encoded length.
+    probe = subprocess.run(
+        ["ffprobe", "-v", "error", "-select_streams", "v:0",
+         "-show_entries", "stream=nb_frames,duration", "-of", "csv=p=0", str(out)],
+        capture_output=True, text=True, check=True).stdout.strip()
+    got_dur, got_frames = probe.split(",")[0], int(probe.split(",")[1])
+    if got_frames != total_frames:
+        raise SystemExit("timeline drift: planned %d frames, encoded %d"
+                         % (total_frames, got_frames))
+    print("%s  %d B  %d frames  %ss (planned %.2fs)"
+          % (out, out.stat().st_size, got_frames, got_dur, planned))
 
 
 if __name__ == "__main__":
