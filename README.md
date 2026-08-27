@@ -1,5 +1,7 @@
 # Alpaca Momentum Options Agent
 
+![Momentum Risk-Cap Options Agent](assets/cover.png)
+
 One-line pitch: an autonomous paper-trading agent that reads recent price momentum
 through Alpaca's official MCP server, turns a strong signal into a sized,
 defined-risk options trade (a debit vertical spread — long call / short farther call
