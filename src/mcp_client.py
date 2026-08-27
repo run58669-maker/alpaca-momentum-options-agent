@@ -606,12 +606,21 @@ class AlpacaMCPClient(BaseAlpacaMCPClient):
     ORDER_PAGE_SIZE = 500  # upstream maximum for get_orders (default is 50)
     MAX_ORDER_PAGES = 10
 
+    # Pinned, not floating. `uvx alpaca-mcp-server` resolves to whatever is latest on
+    # PyPI *at spawn time*, so an upstream release mid-run would silently swap the
+    # server under a live position. Every wire shape in this file was transcribed from
+    # -- and on 2026-08-27 verified against the advertised inputSchema of -- this exact
+    # version. Bump it only after re-running scripts/preflight_live.py.
+    SERVER_SPEC = "alpaca-mcp-server==2.3.0"
+
     async def connect(self) -> None:
         # Imported lazily so `--dry` runs never need the `mcp` package installed.
         from mcp import ClientSession, StdioServerParameters
         from mcp.client.stdio import stdio_client
 
-        params = StdioServerParameters(command="uvx", args=["alpaca-mcp-server"], env=self._env)
+        params = StdioServerParameters(
+            command="uvx", args=["--from", self.SERVER_SPEC, "alpaca-mcp-server"], env=self._env
+        )
         self._stdio_ctx = stdio_client(params)
         read, write = await self._stdio_ctx.__aenter__()
         self._client_ctx = ClientSession(read, write)

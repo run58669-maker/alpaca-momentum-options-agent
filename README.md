@@ -66,8 +66,17 @@ the naked long and says so in the reason (`--spread-width-pct 0` forces that pat
 pip install -r requirements.txt
 ```
 
-Real run needs `uv`/`uvx` on PATH (spawns `uvx alpaca-mcp-server`) and free Alpaca
-paper API keys (see `NEXT.md`):
+Real run needs `uv`/`uvx` on PATH (it spawns the pinned `alpaca-mcp-server==2.3.0`) and
+free Alpaca paper API keys from https://alpaca.markets. Before the first live session,
+prove the transport without an account:
+
+```
+py scripts/preflight_live.py
+```
+
+It handshakes with the real server using placeholder credentials and checks every tool
+name and argument name this project sends against the server's advertised schema.
+Then:
 
 ```
 set ALPACA_API_KEY=...

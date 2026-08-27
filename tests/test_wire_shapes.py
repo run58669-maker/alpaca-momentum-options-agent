@@ -11,6 +11,7 @@ Stdlib only:
 
 from __future__ import annotations
 
+import re
 import sys
 import unittest
 from datetime import date, timedelta
@@ -259,6 +260,39 @@ class TestRealWireShapeReachesTheStrategy(unittest.TestCase):
         )
         self.assertEqual(decision.action, "buy_call")
         self.assertIn(decision.contract["symbol"], decision.reason)
+
+
+class TestLivePreflightStaysHonest(unittest.TestCase):
+    """scripts/preflight_live.py is the only proof the live wire shapes are real.
+
+    It can only prove what it checks, so these guard the two ways it goes stale:
+    an unpinned server (it would verify a different build than the one that runs)
+    and a new `_call` site that never made it into the preflight's table.
+    """
+
+    def _preflight_calls(self):
+        import importlib.util
+
+        path = Path(__file__).parent.parent / "scripts" / "preflight_live.py"
+        spec = importlib.util.spec_from_file_location("preflight_live", path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module.CALLS
+
+    def test_the_server_version_is_pinned(self):
+        from mcp_client import AlpacaMCPClient
+
+        self.assertRegex(AlpacaMCPClient.SERVER_SPEC, r"^alpaca-mcp-server==\d+\.\d+\.\d+$")
+
+    def test_the_preflight_covers_every_tool_the_client_calls(self):
+        source = (Path(__file__).parent.parent / "src" / "mcp_client.py").read_text(
+            encoding="utf-8"
+        )
+        # Only the real client reaches the network; the mock has no _call sites.
+        live = source[source.index("class AlpacaMCPClient"):]
+        called = set(re.findall(r'_call\(\s*"([a-z_]+)"', live))
+        self.assertTrue(called, "no _call sites found -- the regex has drifted")
+        self.assertEqual(called - set(self._preflight_calls()), set())
 
 
 if __name__ == "__main__":
