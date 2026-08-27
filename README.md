@@ -13,6 +13,10 @@ Built for the [Alpaca AI Trading Agents Hackathon](https://lablab.ai/ai-hackatho
 (lablab.ai, 2026-08-28 → 2026-09-04). Paper trading only. No real-money code path
 exists anywhere in this repo.
 
+Write-up: [`WRITEUP.md`](WRITEUP.md) · Slides: [`assets/slides.pdf`](assets/slides.pdf)
+(8 pages, rendered from this repo's own source by [`scripts/make_slides.py`](scripts/make_slides.py);
+page images in [`assets/slides/`](assets/slides))
+
 ## Architecture
 
 ```
