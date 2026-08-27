@@ -4,3 +4,11 @@ __pycache__/
 venv/
 journal/*.jsonl
 .env
+scratch/
+
+# Internal working docs — not part of the public submission repo
+# (contain personal identity fields, main-session notes and Chinese planning text)
+NEXT.md
+SUBMISSION.md
+CODEX_REVIEW_*.md
+*.bak-*

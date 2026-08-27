@@ -19,20 +19,38 @@ class Journal:
             f.write(json.dumps(record, default=str) + "\n")
         return record
 
-    def realized_loss_today(self) -> float:
-        """Sum of negative `realized_pnl` fields logged today. 0.0 if none / file missing."""
+    def logged_closing_ids(self) -> set[str]:
+        """Every `closing_activity_id` already journalled, across all days.
+
+        Reconciliation runs on every pass over an overlapping window of fills, so
+        this is what stops one closed position from being counted as a fresh loss
+        again and again until the circuit breaker trips on nothing.
+        """
+        ids: set[str] = set()
+        for record in self._records():
+            activity_id = record.get("closing_activity_id")
+            if activity_id:
+                ids.add(str(activity_id))
+        return ids
+
+    def _records(self) -> list[dict[str, Any]]:
         if not self.path.exists():
-            return 0.0
-        today = datetime.now(timezone.utc).date().isoformat()
-        loss = 0.0
+            return []
+        records = []
         with self.path.open(encoding="utf-8") as f:
             for line in f:
                 line = line.strip()
-                if not line:
-                    continue
-                record = json.loads(line)
-                if record.get("ts", "").startswith(today) and "realized_pnl" in record:
-                    pnl = record["realized_pnl"]
-                    if pnl < 0:
-                        loss += -pnl
+                if line:
+                    records.append(json.loads(line))
+        return records
+
+    def realized_loss_today(self) -> float:
+        """Sum of negative `realized_pnl` fields logged today. 0.0 if none / file missing."""
+        today = datetime.now(timezone.utc).date().isoformat()
+        loss = 0.0
+        for record in self._records():
+            if record.get("ts", "").startswith(today) and "realized_pnl" in record:
+                pnl = record["realized_pnl"]
+                if pnl < 0:
+                    loss += -pnl
         return loss
