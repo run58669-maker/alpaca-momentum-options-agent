@@ -1,4 +1,4 @@
-# Alpaca Momentum Options Agent (name TBD)
+# Alpaca Momentum Options Agent
 
 One-line pitch: an autonomous paper-trading agent that reads recent price momentum
 through Alpaca's official MCP server, turns a strong signal into a sized,
