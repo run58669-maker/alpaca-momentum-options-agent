@@ -1,9 +1,11 @@
 # DEMO_SCRIPT.md — pitch video, shot by shot
 
 Target length **3:00** (hackathon cap is 5:00 — under is better than over).
-Written 2026-08-25. Every line quoted under **On screen** below was captured from a
-real run on 2026-08-25 15:05 JST; the capture file is named next to each shot so the
-script can be re-verified before recording instead of trusted.
+Written 2026-08-25, **all shots re-captured 2026-08-27 15:05-15:15 JST**. Every line
+quoted under **On screen** below is a paste from a capture file dated `20260827`, not
+a retyped number; the capture file is named next to each shot so the script can be
+re-verified before recording instead of trusted. The dates and OCC symbols in those
+captures are generated relative to the run day — see pre-flight step 4.
 
 **The one rule for this video:** every frame that shows fabricated data must say so
 on the frame. The `--dry` mock account, its $100,000 equity, its positions and its
@@ -19,13 +21,26 @@ narration says "mock" out loud at least once per shot.
 1. `cd` to the repo root. Terminal **at least 150 columns wide** — the reason strings
    are one long line each and wrapping makes them unreadable on video.
 2. Font size up until the smallest text is legible in a 1080p frame.
-3. `py -m unittest discover -s tests` once to warm the interpreter, then delete
-   `journal/decisions.jsonl` so the journal shot shows only this recording's records.
-4. Re-run every command in this file and diff against the **On screen** blocks. If
-   anything drifted, fix the script, not the recording.
+3. 🚨 **Delete `journal/decisions.jsonl` before shot 2 AND again before shot 4a.**
+   This is not cosmetic tidying — shot 4a does not work without it. The mock account
+   seeds one closing fill (`mockfill-close-1`, a $450 realized loss); the reconciler
+   records it **once ever**, keyed on that activity id, so once any run has booked it
+   the journal never books it again. `realized_loss_today()` then returns `0.00`, the
+   circuit breaker does not trip, and shot 4a quietly opens a spread instead of
+   refusing — no error, no warning, just the wrong take. Measured 2026-08-27 15:05:
+   with the day's existing journal, `--max-daily-loss-pct 0.001` traded normally
+   (`scratch/demo_shot_breaker_20260827_1505.txt`); with the journal removed, the same
+   command printed the breaker line (`scratch/demo_shot_breaker_freshjournal_20260827_1511.txt`).
+   Shot 2 consumes the fill, so shot 4a needs its own fresh journal.
+4. **The captures below age out daily.** The mock chain's expiries are generated
+   relative to `today` (`CHAIN_EXPIRY_DAYS = (1, 3, 10, 17, 45)` in
+   `src/mcp_client.py`), so every date, OCC symbol and idempotency key in the blocks
+   below moves when the date does. The dollar figures and percentages hold; the
+   symbols do not. **Re-run every command on the recording day** and diff against the
+   blocks. If something drifted, fix the script, not the recording.
 5. Nothing here needs keys or network. The whole video can be shot offline.
-
----
+6. Re-recording order is load-bearing: 2 → 3 → (wipe journal) → 4a → 4b → 5 → 6.
+   Shot 5 reads the last journal record, which is shot 4a's breaker record.
 
 ## Shot 1 — the claim (0:00-0:20)
 
@@ -51,19 +66,22 @@ that says `ALPACA_PAPER_TRADE` is hardcoded to `"true"`.
 py src/agent.py --dry
 ```
 
-**On screen** (from `scratch/demo_shot_dry_20260825_1715.txt`; two `idempotency key:`
-lines, the `reconciled:` line that follows the exits, and the tail of the `reason:`
-string are elided here for length — the real run prints them, and shot 3 shows the
-full reason):
+**On screen** (verbatim and complete, `scratch/demo_shot_dry_20260827_1510.txt` —
+nothing elided; the last two lines wrap on any terminal, which is what shot 3 is for):
 ```
-    exit_skip: IWM 2026-08-30 put: IWM260830P00200000 has 0 contracts available (a close is already working); not sending a second closing order.
-    exit_close: time stop: QQQ 2026-08-26 call expires in 1 day(s) (<= close_before_dte 1); closing 2 contract(s) rather than carrying expiry/assignment risk. Unrealized P&L $20.00.
-      idempotency key: mrcap-close-2026-08-25-bf48354cad790b40
-    exit_close: stop loss: SPY 2026-09-04 put is down -64.0% of its $750.00 cost ($-480.00), at or past stop_loss_pct 50%; closing 3 contract(s).
-    exit_close: take profit: SPY 2026-09-08 call is up 91.7% of its $600.00 cost ($550.00), at or past take_profit_pct 75%; closing 5 contract(s).
-    exit_hold: SPY 2026-09-14 call: 4.5% of cost, 20 day(s) to expiry -- inside [-50%, +75%] and more than 1 day(s) from expiry; leaving it open.
-[1/1] buy_call_spread SPY contracts=5 momentum=7.43% max_loss=$255.00
-    reason: SPY momentum 7.43% over last 10 bars >= threshold; buying 5 call debit spread(s), long SPY260911C00108700 ...
+    exit_skip: IWM 2026-09-06 put: IWM260906P00106500 has 0 contracts available (a close is already working); not sending a second closing order.
+    exit_close: time stop: QQQ 2026-08-28 call expires in 1 day(s) (<= close_before_dte 1); closing 2 contract(s) rather than carrying expiry/assignment risk. Unrealized P&L $40.00. Exit pricing: the marks value flattening this at $444.00, the quotes at $438.00 (longs sold into the bid, shorts bought back at the ask) -- crossing costs $6.00, widest leg 2.7% wide. Sent at market anyway: a resting limit that misses leaves the position open into expiry.
+      idempotency key: mrcap-close-2026-08-27-030d882774d3ef17
+    exit_close: stop loss: SPY 2026-09-06 put is down -63.9% of its $441.00 cost ($-282.00), at or past stop_loss_pct 50%; closing 3 contract(s). Exit pricing: the marks value flattening this at $159.00, the quotes at $156.00 (longs sold into the bid, shorts bought back at the ask) -- crossing costs $3.00, widest leg 3.8% wide. Sent at market anyway: a resting limit that misses leaves the position open into expiry.
+      idempotency key: mrcap-close-2026-08-27-fc433033611baac6
+    exit_close: take profit: SPY 2026-09-13 call is up 90.5% of its $580.00 cost ($525.00), at or past take_profit_pct 75%; closing 5 contract(s). Exit pricing: the marks value flattening this at $1105.00, the quotes at $1075.00 (longs sold into the bid, shorts bought back at the ask) -- crossing costs $30.00, widest leg 3.2% wide. Sent at market anyway: a resting limit that misses leaves the position open into expiry.
+      idempotency key: mrcap-close-2026-08-27-71341a103c5eb6c5
+    exit_hold: SPY 2026-10-11 call: 4.7% of cost, 45 day(s) to expiry -- inside [-50%, +75%] and more than 1 day(s) from expiry; leaving it open.
+    reconciled: SPY260910C00108700 qty=5 closed at $0.70, realized P&L $-450.00
+[1/1] buy_call_spread SPY contracts=5 momentum=7.43% max_loss=$270.00 open_risk=$693.00
+    reason: SPY momentum 7.43% over last 10 bars >= threshold; buying 5 call debit spread(s), long SPY260913C00108700 (strike 108.7, exp 2026-09-13), sized against the binding budget (per-trade, $1000.00; per-trade cap 1.0% of $100,000.00 = $1000.00, portfolio headroom $4307.00 after $693.00 already at risk), max loss $270.00. Selection: picked SPY260913C00108700 -- strike 108.7 is $0.02 from spot $108.72, 17 days to expiry (window 7-21d), out of 11 candidate(s); its market is $1.44/$1.48 = 2.7% wide vs the 10% cap, 3 rejected as too wide. Risk: sold SPY260913C00110900 (strike 110.9, same 2026-09-13 expiry) against it: $2.20 wide vs $3.26 target, cutting cost from $1.48 to a $0.54 net debit and capping max loss at $54.00 per spread, short leg quotes 2.1% wide (1 wider strike(s) rejected on spread). Pricing: long leg at the offer $1.48 (last $1.46), short leg at the bid $0.94 (last $0.95).
+      idempotency key: mrcap-open-2026-08-27-149aa9c109f09b3a
+    order: {'id': 'mock-4', 'client_order_id': 'mrcap-open-2026-08-27-149aa9c109f09b3a', 'order_class': 'mleg', 'qty': 5, 'limit_price': '0.54', 'legs': [{'symbol': 'SPY260913C00108700', 'ratio_qty': '1', 'side': 'buy', 'position_intent': 'buy_to_open'}, {'symbol': 'SPY260913C00110900', 'ratio_qty': '1', 'side': 'sell', 'position_intent': 'sell_to_open'}], 'status': 'filled', 'filled_at': '2026-08-27T06:02:15.981595+00:00'}
 ```
 
 **Narration:**
@@ -71,29 +89,23 @@ full reason):
 > agent thinks in. **Exits run first** — before it looks for a new trade at all, it
 > asks what should come off. A position one day from expiry: closed, because
 > carrying it into expiry is assignment risk nobody signed up for. One down 64
-> percent: stopped out. One up 92 percent: taken. One inside both bands: left alone,
+> percent: stopped out. One up 91 percent: taken. One inside both bands: left alone,
 > and it says why. Only then does it look for something new — and what it opens is a
-> debit spread, five contracts, **maximum loss two hundred fifty-five dollars,
+> debit spread, five contracts, **maximum loss two hundred seventy dollars,
 > computed before the order is sent**.
 
-**Point the cursor at:** `max_loss=$255.00` while saying the last sentence.
+**Point the cursor at:** `max_loss=$270.00` while saying the last sentence.
 
 ---
 
 ## Shot 3 — the reason string (1:00-1:35)
 
 **On screen:** the same terminal, `reason:` line selected and re-flowed so the whole
-string is visible (widen the window, or paste it into an editor at ~8 lines).
+string is visible (widen the window, or paste it into an editor at ~10 lines). Copied
+verbatim out of `scratch/demo_shot_dry_20260827_1510.txt`:
 
 ```
-reason: SPY momentum 7.43% over last 10 bars >= threshold; buying 5 call debit spread(s),
-long SPY260911C00108700 (strike 108.7, exp 2026-09-11), sized at 1.0% of $100,000.00 equity,
-max loss $255.00. Selection: picked SPY260911C00108700 -- strike 108.7 is $0.02 from spot
-$108.72, 17 days to expiry (window 7-21d), out of 11 candidate(s); its market is $1.44/$1.48
-= 2.7% wide vs the 10% cap, 3 rejected as too wide. Risk: sold SPY260911C00110900 (strike
-110.9, same 2026-09-11 expiry) against it: $2.20 wide vs $3.26 target, cutting cost from
-$1.46 to a $0.51 net debit and capping max loss at $51.00 per spread, short leg quotes 2.1%
-wide (1 wider strike(s) rejected on spread).
+reason: SPY momentum 7.43% over last 10 bars >= threshold; buying 5 call debit spread(s), long SPY260913C00108700 (strike 108.7, exp 2026-09-13), sized against the binding budget (per-trade, $1000.00; per-trade cap 1.0% of $100,000.00 = $1000.00, portfolio headroom $4307.00 after $693.00 already at risk), max loss $270.00. Selection: picked SPY260913C00108700 -- strike 108.7 is $0.02 from spot $108.72, 17 days to expiry (window 7-21d), out of 11 candidate(s); its market is $1.44/$1.48 = 2.7% wide vs the 10% cap, 3 rejected as too wide. Risk: sold SPY260913C00110900 (strike 110.9, same 2026-09-13 expiry) against it: $2.20 wide vs $3.26 target, cutting cost from $1.48 to a $0.54 net debit and capping max loss at $54.00 per spread, short leg quotes 2.1% wide (1 wider strike(s) rejected on spread). Pricing: long leg at the offer $1.48 (last $1.46), short leg at the bid $0.94 (last $0.95).
 ```
 
 **Narration:**
@@ -103,7 +115,7 @@ wide (1 wider strike(s) rejected on spread).
 > percent wide against a 10 percent cap — because a strike you cannot get out of is
 > not a position, it is a trap, and three candidates were dropped for exactly that.
 > Then it names the leg it **sold** to cap the loss, and shows the arithmetic: a
-> dollar forty-six of premium cut to a fifty-one cent net debit. None of that
+> dollar forty-eight of premium cut to a fifty-four cent net debit. None of that
 > sentence is generated after the fact. It is the same object the order was built
 > from.
 
@@ -118,12 +130,15 @@ wide (1 wider strike(s) rejected on spread).
 py src/agent.py --dry --max-daily-loss-pct 0.001
 ```
 
-**On screen** (verbatim, `scratch/demo_shot_breaker_20260825_1505.txt`) — the same
-exit lines as shot 2, then:
+**On screen** (verbatim, `scratch/demo_shot_breaker_freshjournal_20260827_1511.txt`)
+— the same exit lines as shot 2, then:
 ```
-[1/1] hold SPY contracts=0 momentum=7.43% max_loss=$0.00
+[1/1] hold SPY contracts=0 momentum=7.43% max_loss=$0.00 open_risk=$693.00
     reason: circuit breaker: today's realized loss $450.00 >= max_daily_loss_pct 0.1% of equity ($100.00); no new risk today.
 ```
+🚨 **Wipe `journal/decisions.jsonl` immediately before this command** — see
+pre-flight step 3. Without that wipe this shot silently shows a normal entry instead
+of a refusal.
 
 **Narration:**
 > Same chain, same 7.4 percent signal — and it refuses. Today's realized loss,
@@ -139,17 +154,19 @@ exit lines as shot 2, then:
 py scratch/repro_duplicate_close_20260825_1120.py
 ```
 
-**On screen** (from `scratch/demo_shot_idem_20260825_1505.txt`; the `decision:` lines
-and the tail of attempt 1's response are elided for length):
+**On screen** (verbatim, `scratch/demo_shot_idem_20260827_1512.txt`; attempt 1's
+`response` line is truncated by the repro script itself, not by this document):
 ```
 --- attempt 1 ---
-  client_order_id: mrcap-close-2026-08-25-bf48354cad790b40
+  decision       : exit_close
+  client_order_id: mrcap-close-2026-08-27-030d882774d3ef17
   order_rejected : False
+  response       : {"id": "mock-1", "client_order_id": "mrcap-close-2026-08-27-030d882774d3ef17", "qty": 2, "type": "market", "status": "filled", "legs": [{"symbol": "QQQ260828C00107700", "ratio_qty": "1", "side": "sell
 --- attempt 2 ---
-  client_order_id: mrcap-close-2026-08-25-bf48354cad790b40
+  decision       : exit_close
+  client_order_id: mrcap-close-2026-08-27-030d882774d3ef17
   order_rejected : True
-  response       : {"error": {"message": "API rejected the order", "http_status": 422,
-                    "detail": {"code": 42210000, "message": "client_order_id must be unique: ..."}}}
+  response       : {"error": {"message": "API rejected the order", "http_status": 422, "detail": {"code": 42210000, "message": "client_order_id must be unique: mrcap-close-2026-08-27-030d882774d3ef17"}}}
 
 orders actually on the wire: 1 (positions closed once)
 ```
@@ -172,10 +189,11 @@ py -c "import json;[print(json.dumps(json.loads(l),indent=2)) for l in list(open
 (or open `journal/decisions.jsonl` in an editor and scroll — whichever reads better
 on camera)
 
-**On screen** (verbatim shape, from the records on disk at 15:05):
+**On screen** (verbatim, `scratch/demo_shot_journal_20260827_1513.txt` — the last
+record after shot 4a, complete, no fields dropped):
 ```json
 {
-  "ts": "2026-08-25T06:01:13.282544+00:00",
+  "ts": "2026-08-27T06:02:29.788062+00:00",
   "symbol": "SPY",
   "market_open": true,
   "equity": 100000.0,
@@ -183,6 +201,19 @@ on camera)
   "action": "hold",
   "contracts": 0,
   "max_loss": 0.0,
+  "client_order_id": null,
+  "order_rejected": false,
+  "open_risk": 693.0,
+  "open_risk_by_structure": {
+    "IWM 2026-09-06 put": 265.0,
+    "SPY 2026-10-11 call": 428.0
+  },
+  "held_risk": 693.0,
+  "working_risk": 0.0,
+  "working_risk_by_order": {},
+  "unpriceable_risk": [],
+  "order_book_gap": null,
+  "blocked_by_exits": [],
   "reason": "circuit breaker: today's realized loss $450.00 >= max_daily_loss_pct 0.1% of equity ($100.00); no new risk today.",
   "order": null
 }
@@ -203,16 +234,17 @@ on camera)
 py -m unittest discover -s tests
 ```
 
-**On screen** (verbatim, `scratch/tests_20260826_1520.txt`):
+**On screen** (verbatim, `scratch/demo_shot_tests_20260827_1514.txt`):
 ```
-Ran 359 tests in 1.764s
+----------------------------------------------------------------------
+Ran 415 tests in 2.216s
 
 OK
 ```
 
 **Narration:**
-> 359 tests, standard library only — no keys, no network, nothing to install. Clone
-> it and everything you just watched runs on your machine in under a second.
+> 415 tests, standard library only — no keys, no network, nothing to install. Clone
+> it and everything you just watched runs on your machine in about two seconds.
 
 **Last frame:** repo URL, full screen, held three seconds in silence.
 
@@ -243,17 +275,15 @@ catch, and one caught overclaim costs more than all six shots earn.
 
 ## Open before recording
 
-- 🚨 **RE-CAPTURE EVERY SHOT. The quoted output below is stale as of 2026-08-26 22:35.**
-  Entry pricing moved from `last_price` to the traded side of the book (ask when buying,
-  bid when selling), so the numbers on screen and in the narration have changed:
-  `max_loss=$255.00` -> `$270.00`, the `$0.51 net debit` -> `$0.54`, `$1.46 of premium`
-  -> `$1.48`, and every decision reason now ends with a `Pricing: ...` clause naming
-  which side of each leg's market it paid. **The numbers in the blocks below were not
-  edited to match** -- they are captures, and a capture that was re-typed by hand is not
-  a capture. Re-run each shot's command, paste the real output, then re-read the
-  narration against it. Shot 2's spoken line "dollar forty-six of premium cut to a
-  fifty-one cent net debit" has to be re-spoken with the new figures.
-  See NOTES.md "Pricing the entry at the market".
+- ~~**RE-CAPTURE EVERY SHOT.**~~ **Done 2026-08-27 15:05-15:15.** Every `On screen`
+  block above was re-run and re-pasted from a capture file dated `20260827`; none was
+  hand-edited. The entry-pricing change (ask when buying, bid when selling) has landed
+  in the quoted numbers — `max_loss` is `$270.00`, the net debit `$0.54`, the premium
+  `$1.48` — and both narration lines that spoke the old figures were re-written. The
+  exit reasons also gained an `Exit pricing: ...` clause that no previous version of
+  this script showed at all.
+  **Still to re-verify on the recording day:** the dates and OCC symbols only, because
+  the mock chain is generated relative to `today` (pre-flight step 4).
 
 - ~~**The naked-long fallback**~~ **Settled 2026-08-26 — no longer blocking.** When
   every candidate short leg is refused by the liquidity screen, the agent holds
