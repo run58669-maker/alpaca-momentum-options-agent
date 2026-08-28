@@ -86,7 +86,7 @@ the wire payloads and the strategy.
 
 A byte-compatible mock of the same interface backs `--dry`, so the full decision path —
 including exits, reconciliation and every risk gate — runs with no keys and no network. The
-suite is **417 tests** (`py -3 -m pytest --collect-only -q`), most of them pinned to wire
+suite is **423 tests** (`py -3 -m pytest --collect-only -q`), most of them pinned to wire
 shapes and gate behaviour rather than to the strategy's opinions.
 
 ## 4. Honest status

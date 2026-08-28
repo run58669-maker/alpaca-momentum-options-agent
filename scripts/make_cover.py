@@ -53,7 +53,7 @@ GATES = [
 ]
 FACTS = [
     ("DEFINED-RISK STRUCTURE", "Debit vertical, 7-21 DTE, TP +75% / SL -50%"),
-    ("OFFLINE TEST SUITE", "417 tests, no keys, no network"),
+    ("OFFLINE TEST SUITE", "423 tests, no keys, no network"),
     ("DECISION JOURNAL", "Append-only JSONL, every no-trade included"),
 ]
 FOOTER = "Alpaca official MCP server, pinned 2.3.0, over stdio   ·   github.com/run58669-maker/alpaca-momentum-options-agent"

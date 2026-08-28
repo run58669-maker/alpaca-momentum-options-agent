@@ -178,7 +178,7 @@ def slide_title(page, total):
     d.text((M, y + 42 * S), "defined-risk options spreads.",
            font=font("segoeuisl.ttf", 27), fill=MUTED)
     y += 122 * S
-    stage_row(d, y, ["PAPER TRADING ONLY", "OFFICIAL MCP SERVER", "417 OFFLINE TESTS"],
+    stage_row(d, y, ["PAPER TRADING ONLY", "OFFICIAL MCP SERVER", "423 OFFLINE TESTS"],
               highlight_last=False, arrows=False)
     return img
 
@@ -292,7 +292,7 @@ def slide_infra(page, total):
         "every tool and argument name this repo sends against the server's own inputSchema — "
         "without touching an account.",
         "A byte-compatible mock backs --dry, so the whole decision path runs with no keys and "
-        "no network: 417 tests.",
+        "no network: 423 tests.",
     ])
     return img
 

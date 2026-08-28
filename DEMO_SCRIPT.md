@@ -1,10 +1,11 @@
 # DEMO_SCRIPT.md — pitch video, shot by shot
 
 Target length **3:00** (hackathon cap is 5:00 — under is better than over).
-Written 2026-08-25, **all shots re-captured 2026-08-27 15:05-15:15 JST and
-re-verified 2026-08-28 02:05-02:07 JST** (5 of 6 blocks byte-identical; shot 6 was
-stale at 415 tests and is now 417 — see the re-verification note at the end). Every line
-quoted under **On screen** below is a paste from a capture file dated `20260827`, not
+Written 2026-08-25, **all shots re-captured 2026-08-27 15:05-15:15 JST, re-verified
+2026-08-28 02:05-02:07 JST, and shot 6 re-captured again 2026-08-28 22:05 JST** because
+the suite grew 417 → 423 (the market-closed gate brought six tests) — see the two
+re-verification notes at the end. Every line quoted under **On screen** below is a paste
+from a capture file (`20260827` for shots 2-5, `20260828` for shot 6), not
 a retyped number; the capture file is named next to each shot so the script can be
 re-verified before recording instead of trusted. The dates and OCC symbols in those
 captures are generated relative to the run day — see pre-flight step 4.
@@ -248,16 +249,16 @@ record after shot 4a, complete, no fields dropped):
 py -m unittest discover -s tests
 ```
 
-**On screen** (verbatim, `scratch/demo_shot_tests_20260828_0207.txt`):
+**On screen** (verbatim, `scratch/demo_shot_tests_20260828_2205.txt`):
 ```
 ----------------------------------------------------------------------
-Ran 417 tests in 2.213s
+Ran 423 tests in 2.415s
 
 OK
 ```
 
 **Narration:**
-> 417 tests, standard library only — no keys, no network, nothing to install. Clone
+> 423 tests, standard library only — no keys, no network, nothing to install. Clone
 > it and everything you just watched runs on your machine in about two seconds.
 
 **Last frame:** repo URL, full screen, held three seconds in silence.
@@ -371,3 +372,28 @@ rewriting them would falsify a log rather than fix an error.
 No dates or OCC symbols had drifted, because 02:05 JST on 08-28 is still 2026-08-27 in
 UTC (pre-flight step 4). **This does not mean the symbols are stable** — they will all
 move at 09:00 JST.
+
+---
+
+## Re-verification log — 2026-08-28 22:02-22:12 JST (417 -> 423)
+
+The market-closed gate (commit `c1d2dbc`) added six tests, so **shot 6's number moved
+again**: `423 passed, 98 subtests passed in 5.15s` / `423 tests collected`. Shot 6 was
+re-captured (`scratch/demo_shot_tests_20260828_2205.txt`, `Ran 423 tests in 2.415s`) and
+its On-screen block, its narration line and `make_demo_video.py`'s shot-6 title all now
+read 423, together with `WRITEUP.md`, `SUBMISSION_COPY.md` (prose + evidence row),
+`SUBMISSION.md`, `make_cover.py` and `make_slides.py`. The three rendered artifacts
+(`assets/cover.png`, `assets/slides.pdf`, `assets/demo.mp4`) were re-rendered in the same
+pass, so no artifact is left printing a number the repo has stopped believing.
+
+**Shots 2-5 were deliberately not re-captured.** Their captures are dated `20260827` and
+re-running them today rolls the mock chain a day. Measured, not assumed
+(`scratch/drift_probe_20260828_2210.diff`, 27 lines): every single difference is a date,
+an OCC symbol derived from a date, an idempotency-key hash derived from a date, or a
+wall-clock `filled_at`. **Every dollar figure, percentage, contract count and reason
+sentence is byte-identical** — `$270.00` max loss, `$0.54` net debit, `$1.48` premium,
+7.43% momentum, 2.7% wide, 11 candidates, 3 rejected. Re-capturing them would therefore
+buy nothing the test-count fix needs, while rewriting every symbol quoted in
+`WRITEUP.md` §1 and `SUBMISSION_COPY.md` — i.e. it would *create* drift rather than
+remove it. The 2026-08-28 02:05 note above still stands unedited: it is the dated record
+of what the suite measured then, and 417 inside it is correct history, not a stale claim.

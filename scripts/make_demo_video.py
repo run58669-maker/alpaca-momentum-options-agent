@@ -65,12 +65,12 @@ SHOTS = [
      "scratch/demo_shot_journal_20260827_1513.txt",
      "py -c \"...\"   # the last journal record", True),
     ("6", "## Shot 6 — close",
-     "scratch/demo_shot_tests_20260828_0207.txt", "py -m unittest discover -s tests", True),
+     "scratch/demo_shot_tests_20260828_2205.txt", "py -m unittest discover -s tests", True),
 ]
 TITLES = {
     "1": "The claim", "2": "One command, the whole loop", "3": "The reason string",
     "4a": "The circuit breaker", "4b": "The duplicate close", "5": "The journal",
-    "6": "417 tests, standard library only",
+    "6": "423 tests, standard library only",
 }
 
 
