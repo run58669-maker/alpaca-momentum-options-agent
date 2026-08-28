@@ -305,10 +305,10 @@ catch, and one caught overclaim costs more than all six shots earn.
   sent" is safe to say as written. Two other paths still trade the naked long and
   neither is a screen refusal: a chain with no cheaper farther strike at all, and
   `--spread-width-pct 0` (which the shot-3 capture uses deliberately). Details and the
-  measurement behind the call: `NEXT.md` item 4b, `NOTES.md` "The naked-long fallback
-  policy". If a shot wants to show it, `scratch/demo_fallback_policy_20260826_1731.txt`
-  puts all three outcomes on one screen — label the chains **CONSTRUCTED** on screen,
-  the capture already prints that word.
+  measurement behind the call: `NOTES.md` "The naked-long fallback policy". If a shot
+  wants to show it, `scratch/demo_fallback_policy_20260826_1731.txt` puts all three
+  outcomes on one screen — label the chains **CONSTRUCTED** on screen, the capture
+  already prints that word.
 - ~~**Recording tool** not chosen.~~ **Chosen 2026-08-28 02:10 — render the frames,
   do not screen-grab them.** ffmpeg 8.1 is on this machine
   (`Gyan.FFmpeg` via winget) and it does expose `gdigrab`, so screen capture is

@@ -427,7 +427,8 @@ It is a shape, not a quote model.
   **naked long**, which has a *larger* max loss than the spread it refused. That is the
   pre-existing fallback, unchanged this round, but the screen makes it fire more often.
   Whether "no liquid short leg" should instead mean "don't take the trade" is an open
-  design question — see NEXT.md.
+  design question. **Settled 2026-08-26: refusal means hold** — see "The naked-long
+  fallback policy" below.
 - Exits do not screen at all: `ExitPolicy` closes at market regardless of how wide the
   market is. Refusing to exit an illiquid position would be worse than paying the
   spread, but the *cost* of that spread is still not measured anywhere.
@@ -803,7 +804,7 @@ the order so a `--dry` journal shows the price the order actually carried.
 up between the chain snapshot and the order, the fallback ends the pass unfilled — no
 position, rather than a position bought above the budget that approved it. There is no
 re-price loop and no marketable-limit padding; both are policy choices that belong with
-the open fallback-policy question in NEXT.md item 4b.
+the fallback-policy question under "The naked-long fallback policy" below.
 
 **Unverified / open.**
 - No order of any kind has ever been sent to a live Alpaca account. The wire shape is
@@ -816,9 +817,10 @@ the open fallback-policy question in NEXT.md item 4b.
   limit, but there is no counter for "the fallback did not fill today", so a fallback
   that never fills is invisible outside the raw journal.
 - The closing side is still unpriced. `place_option_close_order` and the spread close
-  both go out at market, which is the long-standing "exits do not screen" item in
-  NEXT.md 4b — a close at market takes risk *off*, so it is a slippage question rather
-  than a maximum-loss one, but it is not fixed.
+  both go out at market, which is the long-standing "exits do not screen" item raised
+  under "Bid-ask liquidity screen" above and priced (not fixed) under "What an exit
+  crosses, measured" below — a close at market takes risk *off*, so it is a slippage
+  question rather than a maximum-loss one, but it is not fixed.
 
 ## The naked-long fallback policy (2026-08-26)
 

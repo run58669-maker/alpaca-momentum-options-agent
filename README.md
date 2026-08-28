@@ -17,6 +17,26 @@ Write-up: [`WRITEUP.md`](WRITEUP.md) · Slides: [`assets/slides.pdf`](assets/sli
 (8 pages, rendered from this repo's own source by [`scripts/make_slides.py`](scripts/make_slides.py);
 page images in [`assets/slides/`](assets/slides))
 
+## Documents in this repo
+
+- [`WRITEUP.md`](WRITEUP.md) — the one-page submission write-up: what the AI decides,
+  the risk gates it decides under, and which Alpaca infrastructure it runs on.
+- [`NOTES.md`](NOTES.md) — design notes. Every wire contract was read from upstream
+  source before it was coded against, and every rule carries what is still unverified
+  about it.
+- [`RUN_LOG.md`](RUN_LOG.md) — an append-only log of each working round, kept as it was
+  written at the time.
+- [`DEMO_SCRIPT.md`](DEMO_SCRIPT.md) — the demo video storyboard. Every on-screen line
+  is quoted from a capture file in `scratch/`, and
+  [`scripts/make_demo_video.py`](scripts/make_demo_video.py) refuses to render if a
+  quoted line has drifted from its capture.
+
+`RUN_LOG.md` and `DEMO_SCRIPT.md` cite `NEXT.md` in a few places. That is an internal
+working to-do file, not published here; those citations are left as they were written
+rather than edited after the fact. What they point at is written up in `NOTES.md`: the
+naked-long fallback under "The naked-long fallback policy", the entry idempotency key
+under "Idempotency key on opening orders".
+
 ## Architecture
 
 ```
