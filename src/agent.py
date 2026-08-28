@@ -185,6 +185,10 @@ async def run_once(client, strategy: MomentumRiskCapStrategy, journal: Journal, 
                    pnl_lookback_days: int = DEFAULT_PNL_LOOKBACK_DAYS,
                    exit_policy: ExitPolicy | None = None) -> dict:
     clock = await client.get_clock()
+    # Only a clock that *says* closed closes the entry side. A missing `is_open` is
+    # not a closed market -- it is a field the server did not send, and standing down
+    # on it would turn one absent key into a silent halt for a whole unattended run.
+    market_closed = clock.get("is_open") is False
     account = await client.get_account_info()
     equity = float(account["equity"])
 
@@ -264,7 +268,7 @@ async def run_once(client, strategy: MomentumRiskCapStrategy, journal: Journal, 
     # total short by an unknown amount, so the entry side stands down for the same
     # reason it does on an unconfirmed exit: the budget is being read off a number
     # that is missing a term.
-    stood_down = bool(blocked_by_exits or unpriceable)
+    stood_down = bool(market_closed or blocked_by_exits or unpriceable)
 
     order = None
     entry_client_order_id = None
@@ -307,7 +311,18 @@ async def run_once(client, strategy: MomentumRiskCapStrategy, journal: Journal, 
     entry_rejected = bool(order and order.get("error"))
 
     reason = decision.reason
-    if blocked_by_exits:
+    if market_closed:
+        reason = (
+            f"not opening: the clock says the market is closed. The pass still read the book "
+            f"and still reasoned, but the sizing was priced off the last quotes the chain "
+            f"returned and those are not the prices the next open will pay. The entry key is "
+            f"one structure per UTC day, and this agent reads every refusal back as \"an "
+            f"identical opening order is already out there\" -- which an out-of-hours refusal "
+            f"is not, so sending anyway would write a wrong sentence into the record about a "
+            f"trade that never existed. Exits still ran this pass -- they only take risk off. "
+            f"Entry signal was: {decision.reason}"
+        )
+    elif blocked_by_exits:
         reason = (
             f"not opening: {len(blocked_by_exits)} exit(s) this pass are not confirmed filled "
             f"({'; '.join(blocked_by_exits)}). Until they are, the position is still on the book "
