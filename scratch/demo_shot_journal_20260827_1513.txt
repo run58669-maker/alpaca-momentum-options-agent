@@ -1,0 +1,25 @@
+{
+  "ts": "2026-08-27T06:02:29.788062+00:00",
+  "symbol": "SPY",
+  "market_open": true,
+  "equity": 100000.0,
+  "momentum_pct": 0.0743,
+  "action": "hold",
+  "contracts": 0,
+  "max_loss": 0.0,
+  "client_order_id": null,
+  "order_rejected": false,
+  "open_risk": 693.0,
+  "open_risk_by_structure": {
+    "IWM 2026-09-06 put": 265.0,
+    "SPY 2026-10-11 call": 428.0
+  },
+  "held_risk": 693.0,
+  "working_risk": 0.0,
+  "working_risk_by_order": {},
+  "unpriceable_risk": [],
+  "order_book_gap": null,
+  "blocked_by_exits": [],
+  "reason": "circuit breaker: today's realized loss $450.00 >= max_daily_loss_pct 0.1% of equity ($100.00); no new risk today.",
+  "order": null
+}

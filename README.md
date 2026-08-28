@@ -27,9 +27,17 @@ page images in [`assets/slides/`](assets/slides))
 - [`RUN_LOG.md`](RUN_LOG.md) — an append-only log of each working round, kept as it was
   written at the time.
 - [`DEMO_SCRIPT.md`](DEMO_SCRIPT.md) — the demo video storyboard. Every on-screen line
-  is quoted from a capture file in `scratch/`, and
+  is quoted from a capture file in [`scratch/`](scratch), and
   [`scripts/make_demo_video.py`](scripts/make_demo_video.py) refuses to render if a
   quoted line has drifted from its capture.
+
+Every capture file `README.md` or `DEMO_SCRIPT.md` names is published, so the quotes
+and the video can be checked against the terminal output they came from rather than
+taken on trust. `scratch/` is otherwise a working directory and is ignored; the
+published files are allow-listed one by one in [`.gitignore`](.gitignore), never by
+pattern. `NOTES.md` and `RUN_LOG.md` also cite capture files there that are *not*
+published — those are dated entries recording what a measurement printed at the time,
+and they are left as they were written rather than edited after the fact.
 
 `RUN_LOG.md` and `DEMO_SCRIPT.md` cite `NEXT.md` in a few places. That is an internal
 working to-do file, not published here; those citations are left as they were written

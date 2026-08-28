@@ -1,0 +1,12 @@
+--- attempt 1 ---
+  decision       : exit_close
+  client_order_id: mrcap-close-2026-08-27-030d882774d3ef17
+  order_rejected : False
+  response       : {"id": "mock-1", "client_order_id": "mrcap-close-2026-08-27-030d882774d3ef17", "qty": 2, "type": "market", "status": "filled", "legs": [{"symbol": "QQQ260828C00107700", "ratio_qty": "1", "side": "sell
+--- attempt 2 ---
+  decision       : exit_close
+  client_order_id: mrcap-close-2026-08-27-030d882774d3ef17
+  order_rejected : True
+  response       : {"error": {"message": "API rejected the order", "http_status": 422, "detail": {"code": 42210000, "message": "client_order_id must be unique: mrcap-close-2026-08-27-030d882774d3ef17"}}}
+
+orders actually on the wire: 1 (positions closed once)

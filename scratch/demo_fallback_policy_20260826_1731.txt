@@ -1,0 +1,38 @@
+equity $100,000 | per-trade budget 1% = $1,000.00 | spread cap 10% of midpoint | CONSTRUCTED chains
+
+A  short leg is tradable
+   -> action=buy_call_spread  contracts=5  max_loss=$750.00  (75% of budget)
+      X momentum 5.00% over last 10 bars >= threshold; buying 5 call debit spread(s), long
+      X260907C00100000 (strike 100.0, exp 2026-09-07), sized against the binding budget
+      (per-trade, $1000.00; per-trade cap 1.0% of $100,000.00 = $1000.00, portfolio headroom
+      $5000.00 after $0.00 already at risk), max loss $750.00. Selection: picked
+      X260907C00100000 -- strike 100.0 is $0.00 from spot $100.00, 14 days to expiry (window
+      7-21d), out of 2 candidate(s); its market is $4.48/$4.52 = 0.9% wide vs the 10% cap.
+      Risk: sold X260907C00103000 (strike 103.0, same 2026-09-07 expiry) against it: $3.00
+      wide vs $3.00 target, cutting cost from $4.50 to a $1.50 net debit and capping max
+      loss at $150.00 per spread, short leg quotes 1.0% wide.
+
+B  every short leg refused on width
+   -> action=hold  contracts=0  max_loss=$0.00  (0% of budget)
+      X momentum 5.00% would buy a call, but every candidate short leg was refused by the
+      liquidity screen (2 rejected wider than 10% of their midpoint). Falling back to the
+      naked long would commit more of the $1000.00 budget unhedged than the spread it
+      replaces, so this pass stands down instead. Selection: picked X260907C00100000 --
+      strike 100.0 is $0.00 from spot $100.00, 14 days to expiry (window 7-21d), out of 1
+      candidate(s); its market is $4.48/$4.52 = 0.9% wide vs the 10% cap, 2 rejected as too
+      wide. Risk: no cheaper call strike beyond 100.0 expiring 2026-09-07 to sell against it
+      (2 rejected on a bid-ask spread wider than 10%).
+
+C  chain offers no second leg at all
+   -> action=buy_call  contracts=2  max_loss=$900.00  (90% of budget)
+      X momentum 5.00% over last 10 bars >= threshold; buying 2 long call(s), long
+      X260907C00100000 (strike 100.0, exp 2026-09-07), sized against the binding budget
+      (per-trade, $1000.00; per-trade cap 1.0% of $100,000.00 = $1000.00, portfolio headroom
+      $5000.00 after $0.00 already at risk), max loss $900.00. Selection: picked
+      X260907C00100000 -- strike 100.0 is $0.00 from spot $100.00, 14 days to expiry (window
+      7-21d), out of 1 candidate(s); its market is $4.48/$4.52 = 0.9% wide vs the 10% cap.
+      Risk: no cheaper call strike beyond 100.0 expiring 2026-09-07 to sell against it;
+      nothing was refused, so the long leg trades naked (max loss = full premium).
+
+The difference between B and C is not the chain looking different to a human.
+It is that in B the strategy refused something and in C there was nothing to refuse.

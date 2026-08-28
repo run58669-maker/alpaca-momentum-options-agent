@@ -4,7 +4,31 @@ __pycache__/
 venv/
 journal/*.jsonl
 .env
-scratch/
+# Working directory. Ignored by default, but the capture files the public docs
+# quote are allow-listed below so a reader can open them: DEMO_SCRIPT.md quotes
+# every on-screen line out of one of these, and scripts/make_demo_video.py
+# refuses to render when a quoted line has drifted from its capture. Nothing is
+# allow-listed by pattern -- each published file is named, so a new capture stays
+# private until it is deliberately listed.
+scratch/*
+!scratch/demo_shot_dry_20260827_1510.txt
+!scratch/demo_shot_breaker_20260827_1505.txt
+!scratch/demo_shot_breaker_freshjournal_20260827_1511.txt
+!scratch/demo_shot_idem_20260827_1512.txt
+!scratch/demo_shot_journal_20260827_1513.txt
+!scratch/demo_shot_tests_20260828_2205.txt
+!scratch/demo_fallback_policy_20260826_1731.txt
+!scratch/repro_duplicate_close_20260825_1120.py
+!scratch/repro_liquidity_screen_20260825_1345.py
+# The 2026-08-28 re-capture set the DEMO_SCRIPT.md review log compares against.
+!scratch/demo_shot_dry_20260828_0205.txt
+!scratch/demo_shot_breaker_freshjournal_20260828_0206.txt
+!scratch/demo_shot_idem_20260828_0206.txt
+!scratch/demo_shot_journal_20260828_0206.txt
+!scratch/demo_shot_tests_20260828_0207.txt
+!scratch/drift_probe_20260828_2210.diff
+# The end-to-end ffmpeg probe DEMO_SCRIPT.md cites for the render pipeline.
+!scratch/probe.mp4
 
 # Internal working docs — not part of the public submission repo
 # (contain personal identity fields, main-session notes and Chinese planning text)
