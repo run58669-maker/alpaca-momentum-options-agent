@@ -34,6 +34,19 @@ Source: https://lablab.ai/ai-hackathons/alpaca-ai-trading-agents-hackathon , htt
   Alpaca paper account ID, up to 5 social post links.
 - https://lablab.ai/hackathon-rules is a content-free SPA shell anonymously (200, but renders to one
   line) -- the general rule book stays **unverified**.
+- **Two registrations, not one** (read off the event page's "How to participate" block, anonymous
+  fetch 2026-08-28 13:05 JST, HTTP 200 / 448,408 bytes): "The hackathon takes place online on the
+  lablab.ai platform **and the lablab.ai Discord server**. **Please register for both to
+  participate.**" Discord is therefore part of the official entry path, not just a support channel.
+  The page does **not** state a disqualification consequence for skipping it -- that wording only
+  appears in lablab's own reminder mail ("Connecting Discord is required to participate", received
+  2026-08-26 and 2026-08-28). Discord link: https://discord.gg/lablabai .
+- Event window straight out of the page payload (not inferred from prose): `startAt`
+  `2026-08-28T15:00:00.000Z`, `endAt` `2026-09-04T15:00:00.000Z`. Schedule: Kick-off 15:00 UTC,
+  Discord Q&A 16:00 UTC on day 1, "End of Submissions!" 2026-09-04 15:00 UTC.
+- Field size and gating, same payload: `initialParticipants` **2880**, `participantsLimit` null,
+  `signupActive` true, `shouldAutoApproveParticipants` **false** (enrolment is reviewed, so being
+  enrolled is not automatically being approved -- confirming our own status needs a logged-in view).
 
 ## Alpaca MCP Server
 Source: https://github.com/alpacahq/alpaca-mcp-server , https://docs.alpaca.markets/us/docs/alpaca-mcp-server
