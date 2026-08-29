@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Momentum Risk-Cap Options Agent</title>
+<style>:root{--bg:#0a0e14;--panel:#121821;--line:#202a38;--ink:#f2f5f8;--muted:#8a97a6;
+--dim:#5f6c7a;--amber:#f2c14e;--teal:#4fd1a5}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font:15px/1.6 ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:960px;margin:0 auto;padding:40px 22px 80px}
+.eyebrow{color:var(--teal);letter-spacing:.16em;font-size:11px;font-weight:700}
+h1{font-size:34px;line-height:1.15;margin:14px 0 8px}
+.sub{color:var(--muted);font-size:17px;margin:0 0 22px}
+.banner{background:#2a2110;border:1px solid var(--amber);color:var(--amber);
+border-radius:8px;padding:11px 14px;font-weight:700;font-size:13px;letter-spacing:.06em}
+h2{font-size:13px;letter-spacing:.14em;color:var(--teal);margin:38px 0 12px;font-weight:700}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.stages{display:flex;flex-wrap:wrap;gap:8px;padding:0;margin:0;list-style:none}
+.stages li{background:var(--panel);border:1px solid var(--line);border-radius:999px;
+padding:7px 14px;font-size:12px;letter-spacing:.08em;font-weight:700}
+.gates{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:8px;
+padding:0;margin:0;list-style:none}
+.gates li{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--teal);
+border-radius:6px;padding:9px 12px;font-size:13px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.facts .k{color:var(--dim);font-size:11px;letter-spacing:.12em;font-weight:700}
+.facts .v{margin-top:4px;font-size:14px}
+pre{margin:0;overflow-x:auto;font:12.5px/1.65 ui-monospace,"Cascadia Mono",Consolas,monospace;
+color:#dbe4ec;white-space:pre-wrap;word-break:break-word}
+.reasons{list-style:none;padding:0;margin:0}
+.reasons li{border-bottom:1px solid var(--line);padding:11px 0;
+font:12.5px/1.6 ui-monospace,"Cascadia Mono",Consolas,monospace;color:#dbe4ec;
+white-space:pre-wrap;word-break:break-word}
+.reasons li:last-child{border-bottom:0}
+.k{color:var(--dim)}
+a{color:var(--teal)}
+.links{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px;
+padding:0;margin:0;list-style:none}
+.links li{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px 12px;
+font-size:13px}
+footer{margin-top:44px;border-top:1px solid var(--line);padding-top:16px;
+color:var(--dim);font-size:12px}
+.prov{color:var(--dim);font-size:12px;margin-top:8px}</style></head><body><div class=wrap>
+<div class=eyebrow>ALPACA AI TRADING AGENTS HACKATHON  ·  LABLAB.AI  ·  2026</div>
+<h1>Momentum Risk-Cap Options Agent</h1>
+<p class=sub>An autonomous Alpaca agent that turns price momentum into defined-risk options spreads.</p>
+<div class=banner>MOCK DATA -- no Alpaca account attached yet</div>
+<h2>ONE AUTONOMOUS PASS, IN ORDER</h2>
+<ul class=stages><li>EXITS</li><li>RECONCILE P&amp;L</li><li>READ THE BOOK</li><li>ENTRY DECISION</li></ul>
+<h2>9 GATES, EVERY ONE ENFORCED BEFORE AN ORDER IS SENT</h2>
+<ul class=gates><li>Per-trade budget</li><li>Portfolio budget</li><li>In-flight risk</li><li>Daily-loss breaker</li><li>Contract cap</li><li>Liquidity screen</li><li>Limit-only entries</li><li>Naked-short guard</li><li>Stand-down on unknowns</li></ul>
+<h2>AT A GLANCE</h2>
+<div class=facts>
+<div class=panel><div class=k>DEFINED-RISK STRUCTURE</div><div class=v>Debit vertical, 7-21 DTE, TP +75% / SL -50%</div></div>
+<div class=panel><div class=k>OFFLINE TEST SUITE</div><div class=v>423 tests, no keys, no network</div></div>
+<div class=panel><div class=k>DECISION JOURNAL</div><div class=v>Append-only JSONL, every no-trade included</div></div>
+</div>
+<h2>THE DECISION RECORD IT WROTE</h2>
+<div class=panel><pre>{
+  &quot;ts&quot;: &quot;2026-08-27T17:01:53.044961+00:00&quot;,
+  &quot;symbol&quot;: &quot;SPY&quot;,
+  &quot;market_open&quot;: true,
+  &quot;equity&quot;: 100000.0,
+  &quot;momentum_pct&quot;: 0.0743,
+  &quot;action&quot;: &quot;hold&quot;,
+  &quot;contracts&quot;: 0,
+  &quot;max_loss&quot;: 0.0,
+  &quot;client_order_id&quot;: null,
+  &quot;order_rejected&quot;: false,
+  &quot;open_risk&quot;: 693.0,
+  &quot;open_risk_by_structure&quot;: {
+    &quot;IWM 2026-09-06 put&quot;: 265.0,
+    &quot;SPY 2026-10-11 call&quot;: 428.0
+  },
+  &quot;held_risk&quot;: 693.0,
+  &quot;working_risk&quot;: 0.0,
+  &quot;working_risk_by_order&quot;: {},
+  &quot;unpriceable_risk&quot;: [],
+  &quot;order_book_gap&quot;: null,
+  &quot;blocked_by_exits&quot;: [],
+  &quot;reason&quot;: &quot;circuit breaker: today&#x27;s realized loss $450.00 &gt;= max_daily_loss_pct 0.1% of equity ($100.00); no new risk today.&quot;,
+  &quot;order&quot;: null
+}</pre></div>
+<p class=prov>Verbatim from <a href="https://github.com/run58669-maker/alpaca-momentum-options-agent/blob/main/scratch/demo_shot_journal_20260828_0206.txt">scratch/demo_shot_journal_20260828_0206.txt</a>. Every pass is journalled, including the ones that decide not to trade: this one is a no-trade, and the <code>reason</code> field says which gate stopped it.</p>
+<h2>WHY IT DID THAT, IN ITS OWN WORDS</h2>
+<div class=panel><ul class=reasons>
+<li>exit_skip: IWM 2026-09-06 put: IWM260906P00106500 has 0 contracts available (a close is already working); not sending a second closing order.</li>
+<li>exit_close: time stop: QQQ 2026-08-28 call expires in 1 day(s) (&lt;= close_before_dte 1); closing 2 contract(s) rather than carrying expiry/assignment risk. Unrealized P&amp;L $40.00. Exit pricing: the marks value flattening this at $444.00, the quotes at $438.00 (longs sold into the bid, shorts bought back at the ask) -- crossing costs $6.00, widest leg 2.7% wide. Sent at market anyway: a resting limit that misses leaves the position open into expiry.</li>
+<li>exit_close: stop loss: SPY 2026-09-06 put is down -63.9% of its $441.00 cost ($-282.00), at or past stop_loss_pct 50%; closing 3 contract(s). Exit pricing: the marks value flattening this at $159.00, the quotes at $156.00 (longs sold into the bid, shorts bought back at the ask) -- crossing costs $3.00, widest leg 3.8% wide. Sent at market anyway: a resting limit that misses leaves the position open into expiry.</li>
+<li>exit_close: take profit: SPY 2026-09-13 call is up 90.5% of its $580.00 cost ($525.00), at or past take_profit_pct 75%; closing 5 contract(s). Exit pricing: the marks value flattening this at $1105.00, the quotes at $1075.00 (longs sold into the bid, shorts bought back at the ask) -- crossing costs $30.00, widest leg 3.2% wide. Sent at market anyway: a resting limit that misses leaves the position open into expiry.</li>
+<li>exit_hold: SPY 2026-10-11 call: 4.7% of cost, 45 day(s) to expiry -- inside [-50%, +75%] and more than 1 day(s) from expiry; leaving it open.</li>
+<li>reason: SPY momentum 7.43% over last 10 bars &gt;= threshold; buying 5 call debit spread(s), long SPY260913C00108700 (strike 108.7, exp 2026-09-13), sized against the binding budget (per-trade, $1000.00; per-trade cap 1.0% of $100,000.00 = $1000.00, portfolio headroom $4307.00 after $693.00 already at risk), max loss $270.00. Selection: picked SPY260913C00108700 -- strike 108.7 is $0.02 from spot $108.72, 17 days to expiry (window 7-21d), out of 11 candidate(s); its market is $1.44/$1.48 = 2.7% wide vs the 10% cap, 3 rejected as too wide. Risk: sold SPY260913C00110900 (strike 110.9, same 2026-09-13 expiry) against it: $2.20 wide vs $3.26 target, cutting cost from $1.48 to a $0.54 net debit and capping max loss at $54.00 per spread, short leg quotes 2.1% wide (1 wider strike(s) rejected on spread). Pricing: long leg at the offer $1.48 (last $1.46), short leg at the bid $0.94 (last $0.95).</li>
+</ul></div>
+<p class=prov>Verbatim from <a href="https://github.com/run58669-maker/alpaca-momentum-options-agent/blob/main/scratch/demo_shot_dry_20260828_0205.txt">scratch/demo_shot_dry_20260828_0205.txt</a>, a <code>--dry</code> pass against the offline mock. Sizing, the strike choice, the spread that caps the loss and each exit are all explained by the agent at the moment it acts.</p>
+<h2>OFFLINE TEST SUITE</h2>
+<div class=panel><pre>Ran 423 tests in 2.415s
+
+OK</pre></div>
+<p class=prov>Verbatim from <a href="https://github.com/run58669-maker/alpaca-momentum-options-agent/blob/main/scratch/demo_shot_tests_20260828_2205.txt">scratch/demo_shot_tests_20260828_2205.txt</a>. 423 tests, no API keys, no network.</p>
+<h2>THE REST OF THE SUBMISSION</h2>
+<ul class=links>
+<li><a href="https://github.com/run58669-maker/alpaca-momentum-options-agent">Source repository (MIT)</a></li>
+<li><a href="https://github.com/run58669-maker/alpaca-momentum-options-agent/blob/main/WRITEUP.md">One-page write-up</a></li>
+<li><a href="https://github.com/run58669-maker/alpaca-momentum-options-agent/blob/main/assets/demo.mp4">Demo video (3:02, 1080p)</a></li>
+<li><a href="https://github.com/run58669-maker/alpaca-momentum-options-agent/blob/main/assets/slides.pdf">Slide deck (8 pages, PDF)</a></li>
+<li><a href="https://github.com/run58669-maker/alpaca-momentum-options-agent/blob/main/NOTES.md">Engineering notes</a></li>
+<li><a href="https://github.com/run58669-maker/alpaca-momentum-options-agent/blob/main/DEMO_SCRIPT.md">Shot-by-shot demo script</a></li>
+</ul>
+<h2>HONEST STATUS</h2>
+<div class=panel>The agent has never read a live quote. Everything above came from the offline mock of Alpaca's MCP server, and every figure on this page is mock data. The brand-new dedicated paper account the rules require has not been created yet, so there is no P&amp;L to show and none is claimed anywhere on this page, in the deck, on the cover or in the video.</div>
+<footer>Alpaca official MCP server, pinned 2.3.0, over stdio   ·   github.com/run58669-maker/alpaca-momentum-options-agent</footer>
+</div></body></html>
