@@ -1,0 +1,4 @@
+# The demo page is generated with LF endings by scripts/make_demo_site.py. Without
+# this, autocrlf would check it out as CRLF and a regeneration would look like a
+# change, which breaks the "regenerate and diff" check the other generators rely on.
+docs/index.html text eol=lf
