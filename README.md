@@ -17,6 +17,12 @@ Write-up: [`WRITEUP.md`](WRITEUP.md) · Slides: [`assets/slides.pdf`](assets/sli
 (8 pages, rendered from this repo's own source by [`scripts/make_slides.py`](scripts/make_slides.py);
 page images in [`assets/slides/`](assets/slides))
 
+Live demo page: **https://run58669-maker.github.io/alpaca-momentum-options-agent/** — a
+read-only console showing the decision record the agent wrote and the reason it gave for
+each exit and each entry. It is generated from this repo's own capture files by
+[`scripts/make_demo_site.py`](scripts/make_demo_site.py), so nothing on it is retyped and
+nothing on it is live: the agent has never read a real quote, and the page says so.
+
 ## Documents in this repo
 
 - [`WRITEUP.md`](WRITEUP.md) — the one-page submission write-up: what the AI decides,
